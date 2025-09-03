@@ -1,0 +1,19 @@
+# Set default behavior for all text files
+* text=auto
+
+# Explicitly declare text files you want normalized
+*.py text
+*.txt text
+*.md text
+*.html text
+*.css text
+*.js text
+
+# Binary files - do not convert line endings
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.pkl binary

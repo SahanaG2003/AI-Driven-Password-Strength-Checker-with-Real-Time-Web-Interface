@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Password Strength Checker</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: url("padlock.jpg") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+        background: linear-gradient(
+            135deg,
+            rgba(63, 68, 72, 0.85),   /* deep navy blue */
+            rgba(95, 171, 247, 0.75)   /* soft blue */
+        );
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        padding: 30px 40px;
+        width: 600px;
+        text-align: center;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        animation: fadeIn 0.5s ease-in-out;
+        color: #fff; /* make text readable on dark bg */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      color: #f6f3f2;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      color: #0b0b0b;
+      font-size: 1rem;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border 0.3s;
+    }
+    input[type="password"]:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 6px rgba(0,123,255,0.2);
+    }
+    button {
+      background: #012246;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.03);
+    }
+    .result {
+      margin-top: 25px;
+      text-align: left;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .prediction {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .weak { color: #e53935; }
+    .medium { color: #fb8c00; }
+    .strong { color: #43a047; }
+    .very-strong { color: #1e88e5; }
+    ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+    code {
+      background: #434242;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 90%;
+  padding: 12px 40px 12px 12px; /* extra space for icon */
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #444;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Password Strength Checker</h2>
+    <form id="passwordForm">
+      <label for="password">Enter an 8 Digit password with mix of capital letter,small letters,numbers and special characters:</label>
+      <div class="password-wrapper">
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        <span class="toggle-password" onclick="togglePassword()">👁️</span>
+      </div>
+
+      <button type="submit">Check Strength</button>
+    </form>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+  // Handle form submit
+  document.getElementById("passwordForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const password = document.getElementById("password").value;
+    await checkPassword(password);
+  });
+
+  // Real-time check on typing
+  document.getElementById("password").addEventListener("input", async function() {
+    const password = this.value;
+    if (password.length > 0) {
+      await checkPassword(password);
+    } else {
+      document.getElementById("result").innerHTML = "";
+    }
+  });
+
+  // Function to send request to backend and update result
+  async function checkPassword(password) {
+    const response = await fetch("/cgi-bin/check_password.py", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "password=" + encodeURIComponent(password)
+    });
+
+    const data = await response.json();
+
+    let resultHtml = `
+      <div style ="background-color:#012246; color:white; text-align:center;" class="prediction ${data.prediction.toLowerCase().replace(' ','-')}">
+        Prediction: ${data.prediction}
+      </div>
+      <div><b>Hashed:</b> <code>${data.hashed_password}</code></div>
+    `;
+
+    if (data.suggestions && data.suggestions.length > 0) {
+      resultHtml += "<p><b>Suggestions:</b></p><ul>";
+      data.suggestions.forEach(s => {
+        resultHtml += `<li>${s}</li>`;
+      });
+      resultHtml += "</ul>";
+    }
+
+    document.getElementById("result").innerHTML = resultHtml;
+  }
+
+  // Show/hide password toggle
+  function togglePassword() {
+    const passwordField = document.getElementById("password");
+    const toggleIcon = document.querySelector(".toggle-password");
+
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      toggleIcon.textContent = "🙈"; // change icon when visible
+    } else {
+      passwordField.type = "password";
+      toggleIcon.textContent = "👁️"; // reset icon
+    }
+  }
+</script>
+</body>
+</html>
