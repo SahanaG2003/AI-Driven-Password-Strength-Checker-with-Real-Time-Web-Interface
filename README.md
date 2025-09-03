@@ -129,7 +129,7 @@ This project is for **educational purposes** only. Feel free to use and modify i
 
 ## Contact
 
-For any questions or suggestions, reach out via GitHub Issues or contact [your-email@example.com].
+For any questions or suggestions, reach out via GitHub Issues or contact [sahanag2809@gmail.com].
 
 ---
 
