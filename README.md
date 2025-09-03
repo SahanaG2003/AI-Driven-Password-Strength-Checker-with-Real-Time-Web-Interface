@@ -102,17 +102,15 @@ text
 
 ### Password Input and Feedback
 
-![Password Input Screenshot]
-(images/Result1.jpeg)
+![Password Input Screenshot](images/Result1.jpg)
 
 ### Strength Prediction with Suggestions
 
-![Prediction Screenshot](screenshots/prediction.png)
+![Prediction Screenshot](images/Result2.jpg)
 
-*(Replace these placeholders with your actual screenshots in the `screenshots/` folder)*
+![Prediction Screenshot](images/Result3.jpg)
 
----
-
+![Prediction Screenshot](images/Result4.jpg)
 ## Future Enhancements
 
 - Integration of breached password APIs for additional security checking.
